@@ -81,8 +81,11 @@ ephemeral_disk {
             SECRET_KEY = {{.Data.secret_key | toJSON }}
           {{- end }}
           {{- with secret "liquid/${name}/auth.oauth2" }}
-            LIQUID_CLIENT_ID = {{.Data.client_id | toJSON }}
-            LIQUID_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
+            OAUTH2_PROXY_CLIENT_ID = {{.Data.client_id | toJSON }}
+            OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
+            OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
+            OAUTH2_PROXY_EMAIL_DOMAINS = "*"
+            OAUTH2_PROXY_PROVIDER = "nextcloud"
           {{- end }}
           THREADS = ${threads}
           EOF
