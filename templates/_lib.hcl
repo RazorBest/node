@@ -85,7 +85,7 @@ ephemeral_disk {
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
             OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
             OAUTH2_PROXY_EMAIL_DOMAINS = "*"
-            OAUTH2_PROXY_PROVIDER = "nextcloud"
+            OAUTH2_PROXY_PROVIDER = "liquid"
           {{- end }}
           THREADS = ${threads}
           EOF
