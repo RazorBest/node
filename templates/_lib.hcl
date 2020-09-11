@@ -85,7 +85,9 @@ ephemeral_disk {
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
             OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
             OAUTH2_PROXY_EMAIL_DOMAINS = "*"
+            OAUTH2_PROXY_HTTP_ADDRESS = "0.0.0.0:8000"
             OAUTH2_PROXY_PROVIDER = "liquid"
+            OAUTH2_PROXY_UPSTREAM = ""
           {{- end }}
           THREADS = ${threads}
           EOF
