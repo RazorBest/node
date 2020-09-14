@@ -114,14 +114,14 @@ ephemeral_disk {
           "traefik.enable=true",
           "traefik.frontend.rule=Host:${host}",
         ]
-        check {
-          name = "http"
-          initial_status = "critical"
-          type = "http"
-          path = "/__auth/logout"
-          interval = "6s"
-          timeout = "3s"
-        }
+        // check {
+        //   name = "http"
+        //   initial_status = "critical"
+        //   type = "http"
+        //   path = "/__auth/logout"
+        //   interval = "6s"
+        //   timeout = "3s"
+        // }
         check_restart {
           limit = 3
           grace = "55s"
