@@ -83,16 +83,22 @@ ephemeral_disk {
           {{- with secret "liquid/${name}/auth.oauth2" }}
             OAUTH2_PROXY_CLIENT_ID = {{.Data.client_id | toJSON }}
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
+          {{- end }}
             OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
-            OAUTH2_PROXY_EMAIL_DOMAINS = "*"
-            OAUTH2_PROXY_COOKIE_NAME =  "_oauth2_proxy"
+            OAUTH2_PROXY_EMAIL_DOMAINS = "[${config.acme_email}]"
             OAUTH2_PROXY_HTTP_ADDRESS = "0.0.0.0:5000"
             OAUTH2_PROXY_PROVIDER = "liquid"
+            OAUTH2_PROXY_REDIRECT_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}"
+            OAUTH2_PROXY_REDEEM_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}/o/authorize"
+            OAUTH2_PROXY_PROFILE_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}/accounts/profile"
             OAUTH2_PROXY_COOKIE_HTTPONLY = false
+            OAUTH2_PROXY_ENFORCE_HTTPS = true
             OAUTH2_PROXY_COOKIE_SECURE = false
+            OAUTH2_PROXY_SKIP_PROVIDER_BUTTON = true
+            OUATH2_SET_XAUTHREQUEST = true
+            OAUTH2_PROXY_WHITELIST_DOMAIN = ["${name}.${config.liquid_http_protocol}"]
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
-            {{- end }}
           {{- end }}
           THREADS = ${threads}
           EOF
@@ -114,14 +120,14 @@ ephemeral_disk {
           "traefik.enable=true",
           "traefik.frontend.rule=Host:${host}",
         ]
-        // check {
-        //   name = "http"
-        //   initial_status = "critical"
-        //   type = "http"
-        //   path = "/__auth/logout"
-        //   interval = "6s"
-        //   timeout = "3s"
-        // }
+        check {
+          name = "ping"
+          initial_status = "critical"
+          type = "http"
+          path = "/ping"
+          interval = "2s"
+          timeout = "1s"
+        }
         check_restart {
           limit = 3
           grace = "55s"
