@@ -95,7 +95,7 @@ ephemeral_disk {
             OAUTH2_PROXY_ENFORCE_HTTPS = true
             OAUTH2_PROXY_COOKIE_SECURE = false
             OAUTH2_PROXY_SKIP_PROVIDER_BUTTON = true
-            OUATH2_SET_XAUTHREQUEST = true
+            OUATH2_PROXY_SET_XAUTHREQUEST = true
             OAUTH2_PROXY_WHITELIST_DOMAIN = ["${name}.${config.liquid_http_protocol}"]
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
