@@ -87,7 +87,11 @@ ephemeral_disk {
             OAUTH2_PROXY_COOKIE_SECURE = false
             OAUTH2_PROXY_SKIP_PROVIDER_BUTTON = true
             OAUTH2_PROXY_SET_XAUTHREQUEST = true
+            OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY = true
+            OAUTH2_PROXY_SSL_UPSTREAM_INSECURE_SKIP_VERIFY = true
             OAUTH2_PROXY_WHITELIST_DOMAINS = "[\"${name}.${config.liquid_domain}\"]"
+            LIQUID_ENABLE_HYPOTHESIS_HEADERS = true
+            LIQUID_DOMAIN = ${config.liquid_domain}
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
           {{- end }}
