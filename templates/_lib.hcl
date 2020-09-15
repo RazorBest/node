@@ -76,7 +76,7 @@ ephemeral_disk {
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
           {{- end }}
             OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
-            OAUTH2_PROXY_EMAIL_DOMAINS = ["${config.liquid_domain}"]
+            OAUTH2_PROXY_EMAIL_DOMAINS = *
             OAUTH2_PROXY_HTTP_ADDRESS = "0.0.0.0:5000"
             OAUTH2_PROXY_PROVIDER = "liquid"
             OAUTH2_PROXY_REDIRECT_URL = "${config.liquid_http_protocol}://${name}.${config.liquid_domain}/oauth2/callback"
@@ -86,8 +86,8 @@ ephemeral_disk {
             OAUTH2_PROXY_FORCE_HTTPS = true
             OAUTH2_PROXY_COOKIE_SECURE = false
             OAUTH2_PROXY_SKIP_PROVIDER_BUTTON = true
-            OUATH2_PROXY_SET_XAUTHREQUEST = true
-            OAUTH2_PROXY_WHITELIST_DOMAINS = ["${name}.${config.liquid_domain}"]
+            OAUTH2_PROXY_SET_XAUTHREQUEST = true
+            OAUTH2_PROXY_WHITELIST_DOMAINS = "[\"${name}.${config.liquid_domain}\"]"
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
           {{- end }}

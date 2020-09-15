@@ -45,7 +45,7 @@ CORE_AUTH_APPS = [
     {
         'name': 'rocketchat-app',
         'vault_path': 'liquid/rocketchat/app.oauth2',
-        'callback': f'{config.app_url("rocketchat")}/oauth2/callback',
+        'callback': f'{config.app_url("rocketchat")}/_oauth2/callback',
     },
     {
         'name': 'nextcloud',
