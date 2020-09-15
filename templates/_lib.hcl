@@ -71,32 +71,23 @@ ephemeral_disk {
       }
       template {
         data = <<-EOF
-          CONSUL_URL = ${consul_url|tojson}
-          UPSTREAM_SERVICE = ${upstream|tojson}
-          DEBUG = {{key "liquid_debug" | toJSON }}
-          USER_HEADER_TEMPLATE = ${user_header_template|tojson}
-          LIQUID_CORE_SERVICE = "core"
-          LIQUID_PUBLIC_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}"
-          {{- with secret "liquid/${name}/auth.django" }}
-            SECRET_KEY = {{.Data.secret_key | toJSON }}
-          {{- end }}
           {{- with secret "liquid/${name}/auth.oauth2" }}
             OAUTH2_PROXY_CLIENT_ID = {{.Data.client_id | toJSON }}
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
           {{- end }}
             OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
-            OAUTH2_PROXY_EMAIL_DOMAINS = "[${config.acme_email}]"
+            OAUTH2_PROXY_EMAIL_DOMAINS = ["${config.liquid_domain}"]
             OAUTH2_PROXY_HTTP_ADDRESS = "0.0.0.0:5000"
             OAUTH2_PROXY_PROVIDER = "liquid"
-            OAUTH2_PROXY_REDIRECT_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}"
-            OAUTH2_PROXY_REDEEM_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}/o/authorize"
+            OAUTH2_PROXY_REDIRECT_URL = "${config.liquid_http_protocol}://${name}.${config.liquid_domain}/oauth2/callback"
+            OAUTH2_PROXY_REDEEM_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}/o/token/"
             OAUTH2_PROXY_PROFILE_URL = "${config.liquid_http_protocol}://{{key "liquid_domain"}}/accounts/profile"
             OAUTH2_PROXY_COOKIE_HTTPONLY = false
-            OAUTH2_PROXY_ENFORCE_HTTPS = true
+            OAUTH2_PROXY_FORCE_HTTPS = true
             OAUTH2_PROXY_COOKIE_SECURE = false
             OAUTH2_PROXY_SKIP_PROVIDER_BUTTON = true
             OUATH2_PROXY_SET_XAUTHREQUEST = true
-            OAUTH2_PROXY_WHITELIST_DOMAIN = ["${name}.${config.liquid_http_protocol}"]
+            OAUTH2_PROXY_WHITELIST_DOMAINS = ["${name}.${config.liquid_domain}"]
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
           {{- end }}
@@ -120,14 +111,14 @@ ephemeral_disk {
           "traefik.enable=true",
           "traefik.frontend.rule=Host:${host}",
         ]
-        check {
-          name = "ping"
-          initial_status = "critical"
-          type = "http"
-          path = "/ping"
-          interval = "2s"
-          timeout = "1s"
-        }
+        // check {
+        //   name = "ping"
+        //   initial_status = "critical"
+        //   type = "http"
+        //   path = "/ping"
+        //   interval = "2s"
+        //   timeout = "1s"
+        // }
         check_restart {
           limit = 3
           grace = "55s"

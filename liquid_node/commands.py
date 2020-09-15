@@ -25,47 +25,47 @@ CORE_AUTH_APPS = [
     {
         'name': 'authdemo',
         'vault_path': 'liquid/authdemo/auth.oauth2',
-        'callback': f'{config.app_url("authdemo")}/__auth/callback',
+        'callback': f'{config.app_url("authdemo")}/oauth2/callback',
     },
     {
         'name': 'hoover',
         'vault_path': 'liquid/hoover/auth.oauth2',
-        'callback': f'{config.app_url("hoover")}/__auth/callback',
+        'callback': f'{config.app_url("hoover")}/oauth2/callback',
     },
     {
         'name': 'dokuwiki',
         'vault_path': 'liquid/dokuwiki/auth.oauth2',
-        'callback': f'{config.app_url("dokuwiki")}/__auth/callback',
+        'callback': f'{config.app_url("dokuwiki")}/oauth2/callback',
     },
     {
         'name': 'rocketchat-authproxy',
         'vault_path': 'liquid/rocketchat/auth.oauth2',
-        'callback': f'{config.app_url("rocketchat")}/__auth/callback',
+        'callback': f'{config.app_url("rocketchat")}/oauth2/callback',
     },
     {
         'name': 'rocketchat-app',
         'vault_path': 'liquid/rocketchat/app.oauth2',
-        'callback': f'{config.app_url("rocketchat")}/_oauth/liquid',
+        'callback': f'{config.app_url("rocketchat")}/oauth2/callback',
     },
     {
         'name': 'nextcloud',
         'vault_path': 'liquid/nextcloud/auth.oauth2',
-        'callback': f'{config.app_url("nextcloud")}/__auth/callback',
+        'callback': f'{config.app_url("nextcloud")}/oauth2/callback',
     },
     {
         'name': 'codimd-app',
         'vault_path': 'liquid/codimd/app.auth.oauth2',
-        'callback': f'{config.app_url("codimd")}/auth/oauth2/callback',
+        'callback': f'{config.app_url("codimd")}/oauth2/callback',
     },
     {
         'name': 'codimd-authproxy',
         'vault_path': 'liquid/codimd/auth.oauth2',
-        'callback': f'{config.app_url("codimd")}/__auth/callback',
+        'callback': f'{config.app_url("codimd")}/oauth2/callback',
     },
     {
         'name': 'hypothesis',
         'vault_path': 'liquid/hypothesis/auth.oauth2',
-        'callback': f'{config.app_url("hypothesis")}/__auth/callback',
+        'callback': f'{config.app_url("hypothesis")}/oauth2/callback',
     },
 ]
 
