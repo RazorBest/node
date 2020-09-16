@@ -32,7 +32,7 @@ ephemeral_disk {
 }
 {%- endmacro %}
 
-{%- macro authproxy_group(name, host, upstream, threads=24, memory=300, user_header_template="{}", count=1) %}
+{%- macro authproxy_group(name, host, upstream, threads=24, memory=300, user_header_template="{}", count=1, extra_header = false) %}
   group "authproxy" {
     ${ group_disk() }
     spread { attribute = {% raw %}"${attr.unique.hostname}"{% endraw %} }
@@ -92,7 +92,9 @@ ephemeral_disk {
             OAUTH2_PROXY_SSL_INSECURE_SKIP_VERIFY = true
             OAUTH2_PROXY_SSL_UPSTREAM_INSECURE_SKIP_VERIFY = true
             OAUTH2_PROXY_WHITELIST_DOMAINS = "[\"${name}.${config.liquid_domain}\"]"
+            {%- if extra_header %}
             LIQUID_ENABLE_HYPOTHESIS_HEADERS = true
+            {%- endif %}
             LIQUID_DOMAIN = ${config.liquid_domain}
             {{- range service "${upstream}" }}
             OAUTH2_PROXY_UPSTREAMS = "http://{{.Address}}:{{.Port}}"
