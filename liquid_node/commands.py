@@ -288,6 +288,14 @@ def deploy(secrets, checks):
         'pass': random_secret(64),
     })
 
+    ALL_APPS = ('liquid', 'hoover', 'dokuwiki', 'rocketchat', 'nextcloud',
+                'hypothesis',)
+
+    for name in ALL_APPS :
+        ensure_secret(f'liquid/{name}/cookie', lambda : {
+            'cookie': random_secret(64),
+        })
+
     # Start liquid-core in order to setup the auth
     liquid_checks = start('liquid', dict(jobs)['liquid'])
     if checks:

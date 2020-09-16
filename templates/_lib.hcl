@@ -75,7 +75,9 @@ ephemeral_disk {
             OAUTH2_PROXY_CLIENT_ID = {{.Data.client_id | toJSON }}
             OAUTH2_PROXY_CLIENT_SECRET = {{.Data.client_secret | toJSON }}
           {{- end }}
-            OAUTH2_PROXY_COOKIE_SECRET = "aaaabbbbccccdddd"
+          {{- with secret "liquid/${name}/cookie" }}
+            OAUTH2_PROXY_COOKIE_SECRET = {{.Data.cookie | toJSON }}
+          {{- end }}
             OAUTH2_PROXY_EMAIL_DOMAINS = *
             OAUTH2_PROXY_HTTP_ADDRESS = "0.0.0.0:5000"
             OAUTH2_PROXY_PROVIDER = "liquid"
