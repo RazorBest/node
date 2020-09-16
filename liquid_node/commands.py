@@ -8,7 +8,6 @@ from .docker import docker
 from .vault import vault
 from time import time, sleep
 from collections import defaultdict
-from .configuration import Configuration
 import click
 import os
 import logging
@@ -212,6 +211,35 @@ def check_system_config():
         'the "vm.max_map_count" kernel parameter is too low, check readme'
 
 
+def get_secrets(vault_secret_keys, core_auth_apps):
+    for path in vault_secret_keys:
+            ensure_secret_key(path)
+    
+    if config.ci_enabled:
+            vault.set('liquid/ci/drone.github', {
+                'client_id': config.ci_github_client_id,
+                'client_secret': config.ci_github_client_secret,
+                'user_filter': config.ci_github_user_filter,
+            })
+            vault.set('liquid/ci/drone.docker', {
+                'username': config.ci_docker_username,
+                'password': config.ci_docker_password,
+            })
+
+    ensure_secret('liquid/rocketchat/adminuser', lambda: {
+        'username': 'rocketchatadmin',
+        'pass': random_secret(64),
+    })
+
+    for name in config.ALL_APPS :
+        ensure_secret(f'liquid/{name}/cookie', lambda : {
+            'cookie': random_secret(64),
+        })
+
+
+    
+
+
 @liquid_commands.command()
 @click.option('--no-secrets', 'secrets', is_flag=True, default=True)
 @click.option('--no-checks', 'checks', is_flag=True, default=True)
@@ -254,22 +282,7 @@ def deploy(secrets, checks):
     for job in config.enabled_jobs:
         vault_secret_keys += list(job.vault_secret_keys)
         core_auth_apps += list(job.core_auth_apps)
-
-    if secrets:
-        for path in vault_secret_keys:
-            ensure_secret_key(path)
-
-        if config.ci_enabled:
-            vault.set('liquid/ci/drone.github', {
-                'client_id': config.ci_github_client_id,
-                'client_secret': config.ci_github_client_secret,
-                'user_filter': config.ci_github_user_filter,
-            })
-            vault.set('liquid/ci/drone.docker', {
-                'username': config.ci_docker_username,
-                'password': config.ci_docker_password,
-            })
-
+        
     def start(job, hcl):
         log.info('Starting %s...', job)
         spec = nomad.parse(hcl)
@@ -283,29 +296,11 @@ def deploy(secrets, checks):
         return job_checks
 
     jobs = [(job.name, get_job(job.template)) for job in config.enabled_jobs]
-
-    ensure_secret('liquid/rocketchat/adminuser', lambda: {
-        'username': 'rocketchatadmin',
-        'pass': random_secret(64),
-    })
-
-    for name in Configuration.ALL_APPS :
-        ensure_secret(f'liquid/{name}/cookie', lambda : {
-            'cookie': random_secret(64),
-        })
-
+   
     # Start liquid-core in order to setup the auth
     liquid_checks = start('liquid', dict(jobs)['liquid'])
     if checks:
-        wait_for_service_health_checks({'core': liquid_checks['core']})
-
-    if secrets:
-        for app in core_auth_apps:
-            log.info('Auth %s -> %s', app['name'], app['callback'])
-            cmd = ['./manage.py', 'createoauth2app', app['name'], app['callback']]
-            output = retry()(docker.exec_)('liquid:core', *cmd)
-            tokens = json.loads(output)
-            vault.set(app['vault_path'], tokens)
+        wait_for_service_health_checks({'core': liquid_checks['core']})     
 
     # check if there are jobs to stop
     nomad_jobs = set(job['ID'] for job in nomad.jobs())
@@ -324,6 +319,17 @@ def deploy(secrets, checks):
     for job, hcl in deps_jobs:
         job_checks = start(job, hcl)
         health_checks.update(job_checks)
+
+
+    if secrets:
+        get_secrets(vault_secret_keys, core_auth_apps)
+
+    for app in core_auth_apps:
+        log.info('Auth %s -> %s', app['name'], app['callback'])
+        cmd = ['./manage.py', 'createoauth2app', app['name'], app['callback']]
+        output = retry()(docker.exec_)('liquid:core', *cmd)
+        tokens = json.loads(output)
+        vault.set(app['vault_path'], tokens)    
 
     # wait until all deps are healthy
     if checks:
@@ -387,17 +393,17 @@ def alloc(job, group):
     print(first(running, 'running allocations'))
 
 
-@liquid_commands.command()
+@liquid_commands.command(context_settings={"ignore_unknown_options": True})
 @click.argument('name')
-@click.argument('args', nargs=-1)
+@click.argument('args', nargs=-1, type=str)
 def shell(name, args):
     """Open a shell in a docker container addressed as JOB:TASK"""
     docker.shell(name, *args)
 
 
-@liquid_commands.command()
+@liquid_commands.command(context_settings={"ignore_unknown_options": True})
 @click.argument('name')
-@click.argument('args', nargs=-1)
+@click.argument('args', nargs=-1, type=str)
 def dockerexec(name, args):
     """Run `nomad alloc exec` in a container addressed as JOB:TASK"""
     run_fg(docker.exec_command(name, *args, tty=False), shell=False)
