@@ -8,6 +8,7 @@ from .docker import docker
 from .vault import vault
 from time import time, sleep
 from collections import defaultdict
+from .configuration import Configuration
 import click
 import os
 import logging
@@ -288,10 +289,7 @@ def deploy(secrets, checks):
         'pass': random_secret(64),
     })
 
-    ALL_APPS = ('liquid', 'hoover', 'dokuwiki', 'rocketchat', 'nextcloud',
-                'hypothesis',)
-
-    for name in ALL_APPS :
+    for name in Configuration.ALL_APPS :
         ensure_secret(f'liquid/{name}/cookie', lambda : {
             'cookie': random_secret(64),
         })
